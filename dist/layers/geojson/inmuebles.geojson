@@ -1,0 +1,43 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "prop-001",
+        "titulo": "Propiedad Destacada Off Market",
+        "categoria": "residencial",
+        "precio": "U$S 250.000",
+        "descripcion": "Excelente propiedad con documentación técnica completa, planos aprobados, recorrido virtual y vistas aéreas por drone.",
+        "imagenes": ["prop_001_1.jpg", "prop_001_2.jpg"],
+        "url_planos": "https://drive.google.com/file/d/1F0pnMhESCy5T9hd2SIife3d6FWJPk1N-/view?usp=drive_link",
+        "url_catastro": "https://drive.google.com/file/d/181s228v2meFiCDWv5jRfUyxkrr_3rB2f/view?usp=drive_link",
+        "url_360": "https://www.youtube.com/watch?v=IG7Jrgl9h1o",
+        "url_drone": "https://www.youtube.com/watch?v=qKFT4VA7elU"
+      },
+      "geometry": { 
+        "type": "Point", 
+        "coordinates": [-58.3965, -34.5886] 
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "prop-002",
+        "titulo": "Lote Industrial Ruta 9",
+        "categoria": "terreno",
+        "precio": "U$S 120.000",
+        "descripcion": "Lote nivelado listo para construir nave industrial.",
+        "imagenes": ["prop_002_1.jpg"],
+        "url_planos": null,
+        "url_360": null,
+        "url_drone": "https://youtube.com/drone-loster",
+        "url_catastro": null
+      },
+      "geometry": { 
+        "type": "Point", 
+        "coordinates": [-58.8, -34.4] 
+      }
+    }
+  ]
+}

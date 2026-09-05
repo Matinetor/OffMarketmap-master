@@ -27,31 +27,11 @@ CONVENCIONES DE NOMENCLATURA CSS
 - tipo: Opcional. Indica el tipo del elemento HTML(por ejemplo para "input" : "text", "checkbox", etc.).
 - modificador: Opcional. Representa cualquier modificador adicional para la clase.
 
-Ejemplos:
-
-1. Botones:
-  - Clase para un botón primario: .ag-btn-primary
-  - Clase para un botón secundario: .ag-btn-secondary
-
-2. Campos de Entrada:
-  - Clase para un campo de entrada de confirmación: .ag-input-text-confirm
-  - Clase para un campo de entrada de advertencia: .ag-input-text-danger
-
 * Estructura de Nomenclatura para variables css en :root:
 
 --{elemento}-{propiedad}-{modificador}
-
-- elemento: Especifica el tipo de elemento al que pertenecen las propiedades.
-- propiedad: Indica la propiedad CSS que se está definiendo (p. ej., "ftn-size", "border-radius", "background-color").
-- modificador: Opcional. Representa cualquier modificador adicional para la propiedad.
-
-Ejemplos:
-
-1. Botones:
-  - Tamaño de fuente para botones: --btn-ftn-size
-  - Color de fondo para botones primarios: --btn-primary-bg-color
-
 */
+
 @font-face {
   font-family: "Encode Sans";
   src: url("../../../dist/fonts/EncodeSans-Regular.ttf");
@@ -77,30 +57,9 @@ Ejemplos:
   src: url("../../../dist/fonts/fa-solid-900.woff2");
 }
 
-@font-face {
-  font-family: "Star Wars Jedi";
-  src: url("../../../dist/fonts/Starjedi-Regular.ttf");
-}
-
-@font-face {
-  font-family: "Aurebesh";
-  src: url("../../../dist/fonts/Aurebesh.otf");
-}
-
-@font-face {
-  font-family: "Aurebesh Bold";
-  src: url("../../../dist/fonts/Aurebesh-Bold.otf");
-}
-
-/* 
-#0C74A0 #105C97 #3A6EA7 #0094D4 #5BC0DE Colores de prueba
-#0091CE #F38A00 Logo IGN
-#37bbec MapaMuni
-#157DB9#0094d4 Color institucional 2024
-#0db2e0 Color institucional 2023
-#242C4F #45659D #E7BA61 Paleta Manual de marca Presi 2024
-*/
 :root {
+  /* TIP INMOBILIARIO: Si querés que el menú lateral deje de ser celeste y pase a ser Azul Oscuro (estilo premium), 
+     cambiá --primary-color a #2c3e50 y --secondary-color a #34495e */
   --primary-color: #3a6ea7;
   --secondary-color: #0094d4;
   --main-bg-color: #fff;
@@ -117,11 +76,10 @@ Ejemplos:
   --layer-cont-fnt-size: 11px;
   --layer-border-color: 1px solid #ddd;
   --menu-section-hover-color: #e7e7e7;
-  /*#969393 #AAAAAA*/
   --layer-btn-hover-color: #e7e7e7;
-  /*#d1cccc  */
   --main-font-family: "Encode Sans", sans-serif;
   --modal-bg-color: #ffffffbb;
+  
   /*Argenmap ui Button*/
   --btn-ftn-size: 1.5rem;
   --btn-border-radius: 6px;
@@ -131,23 +89,22 @@ Ejemplos:
   --btn-primary-color: var(--primary-color);
   --btn-secondary-color: var(--secondary-color);
   --btn-disabled-color: #838788;
-  /* #AAAAAA */
   --btn-confirm-color: #336337;
-    /* #33B560  #3A8555 #448148*/
   --btn-danger-color: var(--danger-color);
-    /*#CE4946 #EF4D3D #c62828*/
+  
   /*Argenmap ui input text */
   --input-text-ftn-size: 14px;
   --input-text-bg-color: #fff;
   --input-text-border-radius: 6px;
   --input-text-border-color: #939697;
+  
   /*Menu capas*/
   --lyr-menu-bg-color: #ffffff;
   --lyr-menu-panel-head-bg-color: var(--primary-color);
   --lyr-menu-panel-head-text-color: #fff;
   --menu-title-text-color: #fff;
   --menu-text-color: #505050;
-    --menu-text-color-hover: #202020
+  --menu-text-color-hover: #202020
 }
 
 /* General */
@@ -178,12 +135,9 @@ body {
   z-index: 1;
   position: absolute;
   width: 0;
-  /*   height:100%; */
   overflow-y: hidden;
   opacity: 0.9;
   transition: all 0.5s;
-  /* 	display:flex;
-	align-items:center; */
 }
 
 /* Main Content */
@@ -249,12 +203,7 @@ body {
   position: fixed;
   width: 100vw;
   border-radius: 3px;
-  background: linear-gradient(90deg,
-      white 0%,
-      #008dc9 25%,
-      blue 50%,
-      #008dc9 75%,
-      white 100%);
+  background: linear-gradient(90deg, white 0%, #008dc9 25%, blue 50%, #008dc9 75%, white 100%);
   background-size: 200%;
   z-index: 1600;
   animation: moveGradient 0.4s linear infinite;
@@ -556,7 +505,6 @@ div.leaflet-top.leaflet-left {
   max-width: 350px;
 }
 
-
 @media (max-width: 768px) {
   #load-layer {
     max-width: 295px
@@ -568,13 +516,12 @@ div.leaflet-top.leaflet-left {
 }
 
 #sidebar {
-  overflow: auto;
+  overflow: auto; /* ACÁ ES DONDE SE CORTABA EL MENÚ */
   position: relative;
   margin: 0.5rem;
   max-height: 80vh;
   border: 0;
   border-radius: 6px;
-  /*   width: 350px; */
   background-color: transparent;
   max-width: 320px;
 }
@@ -674,16 +621,10 @@ li.active>div>a {
 
 .list-group-item {
   position: initial;
-/*   font-family: "Encode Sans Medium", sans-serif; */
   cursor: pointer;
   padding: 8px 15px;
   background-color: #ffffffcc;
 }
-
-/* .list-group-item.capa {
-  background-color: #ffffff;
-}
-*/
 
 .menu-button {
   background-color: #6e6d6d;
@@ -700,7 +641,6 @@ li.active>div>a {
   font-weight: bold;
 }
 
-/* END ANIMATED X */
 .list-group-item.active {
   border-color: #ccc;
 }
@@ -740,7 +680,6 @@ li.active>div>a {
 }
 
 .item-group-short-desc span {
-/*   font-size: 11px; */
   font-weight: 500;
   color: var(--lyr-menu-panel-head-text-color);
   user-select: none;
@@ -822,14 +761,12 @@ a.item-group-title:hover {
 .zoom-layer-combobox {
   cursor: pointer;
   width: 10%;
-  /* color: silver; */
   opacity: 0.7;
   margin-left: 5%;
 }
 
 .zoom-layer:hover,
 .zoom-layer-combobox:hover {
-  /* color: black; */
   opacity: 1;
 }
 
@@ -938,9 +875,7 @@ a.item-group-title:hover {
     height: initial;
     max-height: 50%;
     overflow-y: auto;
-    box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.2),
-      0 -1px 0px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02);
   }
 }
 
@@ -1010,14 +945,9 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out {
   box-sizing: border-box;
 }
 
-/* The following rule adds shadows to overlay layers elements */
-/* .leaflet-pane .leaflet-overlay-pane:not(:first-child) {
-  filter: drop-shadow(5px -2px 1.5px rgba(5,15,5,0.3));
-} */
 /* Leaflet popup featureInfo */
 .featureInfo {
   font-family: inherit;
-/*   font-size: var(--popup-fnt-size, 12px); */
   width: 100%;
 }
 
@@ -1051,12 +981,6 @@ a.leaflet-control-zoomhome-in, a.leaflet-control-zoomhome-out {
   overflow: auto;
   max-height: 60vh;
 }
-
-/* .leaflet-popup-content {
-  font-family: "Encode Sans", sans-serif;
-  letter-spacing: 0.02em;
-}
-*/
 
 #popupPageSeeker {
   float: left;
@@ -1568,9 +1492,6 @@ input:checked.switch+label:after {
   margin-left: 10px;
 }
 
-/* #logo-help {
-  margin-right: 10px;
-} */
 #geoserver-login-btn {
   width: auto;
   align-self: center;
@@ -1663,9 +1584,7 @@ input:checked.switch+label:after {
   border-radius: 10px;
   -webkit-box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2);
-  box-shadow:
-    0 4px 10px 0 rgba(0, 0, 0, 0.2),
-    0 4px 20px 0 rgba(0, 0, 0, 0.19);
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 4px 20px 0 rgba(0, 0, 0, 0.19);
   color: white;
 }
 
@@ -1677,9 +1596,7 @@ input:checked.switch+label:after {
 /* Measurement Info */
 #measurementWrapper {
   border-radius: 6px;
-  box-shadow:
-    0 2px 4px rgb(0 0 0 / 20%),
-    0 -1px 0 rgb(0 0 0 / 2%);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 20%), 0 -1px 0 rgb(0 0 0 / 2%);
   font-weight: bold;
   padding: 10px;
   text-align: inherit;
@@ -1712,9 +1629,7 @@ input:checked.switch+label:after {
 /* ESRI */
 #esriwrapper {
   border-radius: 8px;
-  box-shadow:
-    0 2px 4px rgb(0 0 0 / 20%),
-    0 -1px 0 rgb(0 0 0 / 2%);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 20%), 0 -1px 0 rgb(0 0 0 / 2%);
   font-weight: bold;
   padding: 10px;
   text-align: inherit;
@@ -1772,10 +1687,9 @@ input:checked.switch+label:after {
 #logo-navbar {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important; /* Controla exactamente la separación entre el logo y CoNaPEAmap */
+  gap: 8px !important;
 }
 
-/* Anulamos la posición absoluta que los desalineaba */
 .navbar-header > a > img,
 #top-left-logo {
   position: static !important;
@@ -1790,81 +1704,29 @@ input:checked.switch+label:after {
   margin-left: 0 !important;
 }
 
-/* Special effects */
-/* Spinning globe effect when hover on 'zoom to home' button */
-/* @keyframes spinning-globe {
-  0% {
-    content: "\f57d";
-  }
-  30% {
-    content: "\f57c";
-  }
-  60% {
-    content: "\f57e";
-  }
-  100% {
-    content: "\e47b";
-  }
+/* --- FIX DEFINITIVO: Solapa de opciones (3 puntos / Geoprocesos) --- */
+
+/* 1. Obligamos a los paneles internos de Bootstrap a no ocultar lo que sobresale */
+#sidebar .panel-collapse, 
+#sidebar .panel-body, 
+#sidebar .list-group, 
+#sidebar .list-group-item {
+    overflow: visible !important;
 }
-.fa-earth-americas:hover::before {
-  font-family: "Font Awesome 6";
-  content    : "\f57d";
-  animation  : spinning-globe 0.5s linear infinite alternate;
-  opacity    : 0.95;
-} */
-/* mayth4th */
-/* 
-@keyframes maythe4th {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0.5;
-  }
+
+/* 2. El truco maestro: Le damos un "espacio fantasma" al fondo del menú lateral. 
+   Esto genera un área invisible que le da lugar a la solapa desplegable 
+   para abrirse completa sin chocar contra el borde. */
+#sidebar {
+    padding-bottom: 220px !important; 
+    overflow-y: auto !important; 
+    overflow-x: hidden !important;
 }
-.fa-earth-americas:hover::before {
-  animation: unset;
-  content  : "\e037";
+
+/* 3. Elevamos cualquier menú desplegable u opciones de capa por encima del mapa */
+.dropdown-menu,
+.context-menu,
+.options-container,
+.layer-options-active {
+    z-index: 99999 !important;
 }
-.fa-earth-americas:hover::after {
-  font-family: "Aurebesh Bold";
-  content    : "May the 4th be with you";
-  margin-left: 15px;
-  font-size  : small;
-  color      : #2FF924;
-  opacity    : 0.7;
-  line-height: 0.8;
-  position   : absolute;
-  animation  : maythe4th 1s linear;
-}
- */
-/* Lightsaber effect for SVG paths (Leaflet geometries) 
-@keyframes glow {
-  to {
-    stroke-width: 3.3px;
-    -webkit-filter: drop-shadow(0px 0px 7px #2FF924) drop-shadow(0px 0px 15px #198013);
-    filter: drop-shadow(0px 0px 7px #2FF924) drop-shadow(0px 0px 15px #198013);
-  }
-}
-.lightsaber {
-  stroke: white;
-  stroke-width: 3px;
-  stroke-opacity: 1;
-  fill: none;
-  -webkit-filter: drop-shadow(0px 0px 4px #2FF924) drop-shadow(0px 0px 15px #198013);
-  filter: drop-shadow(0px 0px 4px #2FF924) drop-shadow(0px 0px 15px #198013);
-  animation: glow 0.1s ease-in-out infinite alternate;
-}*/
-/* .individualFeature > ul > li {
-    padding: 0 10px;
-}
-.individualFeature > ul > li:nth-child(2n) {
-  background-color: #e7e5e5;
-}
-.individualFeature > ul > li > b {
-  text-align: left;
-  margin-right: 10px;
-}
-.individualFeature > ul > li > span {
-  float: right;
-} */

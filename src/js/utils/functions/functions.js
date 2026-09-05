@@ -1267,18 +1267,6 @@ function getDeveveloperLogo() {
 }
 
 function loadDeveloperLogo() {
-  // This creates Argenmap developer's logo at the bottom right corner, we encourage you to leaving this as it comes in the code to give the proper attribution and spread the word about the project. Thanks! :D
-
-  // But, as sometimes is needed to replace the image, it can be done with a custom one adding the key 'overrideDevLogo' in the logo object, within preferences.json as its shown in the following example:
-  /* Note that in the 'src' attribute could be added an image encoded in base64.
-      "logo": {
-        "overrideDevLogo": {
-          "src": "data:image/png;base64,qwertyu",
-          "style": "width: 64px; background-size: cover"
-        }
-      }
-    */
-
   L.Control.DeveloperLogo = L.Control.extend({
     onAdd: function (map) {
       let devLogo = getDeveveloperLogo();
@@ -1289,13 +1277,13 @@ function loadDeveloperLogo() {
       link.id = "developerLogo";
       link.title = STRINGS.about;
       link.style.cursor = "pointer";
+      
       let img = L.DomUtil.create("img");
-      img.src = "src/styles/images/CoNaPEA_logo.png"; // <- Apuntamos directamente a tu logo
-      img.alt = "CoNaPEA logo";
-      img.classList = "brand";
-      img.style = devLogoStyle;
-      img.style.backgroundImage = `url('src/styles/images/CoNaPEA_logo.png')`;
-      img.style.borderRadius = "8px"; // <- Esto le redondea las puntas
+      img.src = "src/styles/images/BG_logo.png"; 
+      img.alt = "BG logo";
+      img.className = "brand";
+      img.style.cssText = devLogoStyle || "";
+      img.style.borderRadius = "8px";
       link.appendChild(img);
 
       link.addEventListener("click", function () {

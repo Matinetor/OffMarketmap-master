@@ -22,7 +22,7 @@ class AboutUsModal {
     aboutHeader.style.borderTopRightRadius = "8px";
 
     const aboutTitle = document.createElement("h3");
-    aboutTitle.innerText = "Red de Facultades de Agrimensura";
+    aboutTitle.innerText = "Visor Inmobiliario - Off Market";
     aboutTitle.style.margin = "0";
     aboutTitle.style.fontWeight = "bold";
 
@@ -38,10 +38,11 @@ class AboutUsModal {
       });
       principalContainer.remove();
       this.isVisible = false;
+    };
 
-      // Crear elemento de imagen para el logo institucional
+    // Crear elemento de imagen para el logo institucional
     const aboutLogo = document.createElement("img");
-    aboutLogo.src = "src/styles/images/CoNaPEA_logo.png";
+    aboutLogo.src = "src/styles/images/BG_logo.png";
     aboutLogo.style.width = "60px";
     aboutLogo.style.height = "60px";
     aboutLogo.style.borderRadius = "10px";
@@ -49,7 +50,6 @@ class AboutUsModal {
     
     // Lo sumás al header junto con el título
     aboutHeader.appendChild(aboutLogo);
-    };
 
     const aboutMainSection = document.createElement("div");
     aboutMainSection.className = "about-main-section";
@@ -233,21 +233,7 @@ class AboutUsTab {
     functionsContainer.id = "functions-container";
     return functionsContainer;
   }
-
-  /**
-   * Creates the contributors container element.
-   * @returns {HTMLElement} - The created contributors container element.
-   
-  createContributorsContainer() {
-      const contributorContainer = document.createElement('div');
-      contributorContainer.classList.add('content-about-tab', 'contributor-container', 'content-about-deactivate');
-      contributorContainer.id = "contributors-container";
-
-      return contributorContainer;
-  }*/
 }
-
-// <div id="passwordToggleContainer"></div>
 
 class InputToggle {
   constructor(parent, type, _onclick, content) {

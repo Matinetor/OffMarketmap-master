@@ -1,4 +1,30 @@
-# Ignorar carpetas de desarrollo
+src/config
+!src/config/default/*
+src/js/map/plugins/leaflet/leaflet-measure/languages
 .vscode
 .hintrc
-
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+.DS_Store
+Thumbs.db
+node_modules/
+# Ignorar dist pero permitir explícitamente layers y fonts
+dist/*
+!dist/layers/
+!dist/layers/geojson/
+!dist/layers/geojson/*.geojson
+!dist/fonts/
+!dist/fonts/*
+build/
+.env
+.env.*
+.idea/
+*.iml
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+*.tsbuildinfo

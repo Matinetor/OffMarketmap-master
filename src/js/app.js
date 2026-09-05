@@ -14,13 +14,7 @@ const app = {
   dependencies: {},
   layerNameByDomId: {},
   templates: ["ign-geoportal-basic"],
-// Le pasamos un ítem base por defecto con una propiedad "capas" vacía para que no explote
-  items: [
-    {
-        capas: [],
-        nombre: "Inicio"
-    }
-  ],
+  items: [],
 
   init: async function (data) {
     Object.assign(app, data);
@@ -757,12 +751,12 @@ async function loadTemplate(data, isDefaultTemplate) {
           document.getElementById("sidebar").style.display = "none";
         }
 
-        // Abrir el panel de Facultades en el momento exacto en que carga la interfaz
+// Abrir el panel de Inmuebles en el momento exacto en que carga la interfaz
         setTimeout(function() {
-            if (!$("#facultades-panel").is(":visible")) {
-                $("#facultades-btn").click();
-                if (typeof cargarVistaInicialFacultades === "function" && $("#facultades-contenido").is(":empty")) {
-                    cargarVistaInicialFacultades();
+            if (!$("#inmuebles-panel").is(":visible")) {
+                $("#inmuebles-btn").click();
+                if (typeof cargarVistaInicialInmuebles === "function" && $("#inmuebles-contenido").is(":empty")) {
+                    cargarVistaInicialInmuebles();
                 }
             }
         }, 10)
@@ -847,53 +841,62 @@ document.addEventListener("contextmenu", (e) => {
 });
 
 /**
- * Renderizado de información académica para la nueva versión de Argenmap
+ * Renderizado de información Inmobiliaria "Off Market" con Filtro por Categoría y Buscador
  */
 
 // Variable global para almacenar las features del GeoJSON una vez cargadas
-let cacheFacultades = null;
+let cacheInmuebles = null;
 
-// 1. Vista por defecto del panel (Incluye el texto inicial y el buscador de facultades)
-function cargarVistaInicialFacultades() {
-    const $contenedor = $("#facultades-contenido");
+// 1. Vista por defecto del panel (Incluye selector de categorías y buscador)
+function cargarVistaInicialInmuebles() {
+    const $contenedor = $("#inmuebles-contenido");
     if ($contenedor.length === 0) return;
     
     $contenedor.html(`
-        <div class="alert alert-info" role="alert" style="font-size: 0.9rem; margin-bottom: 10px;">
-            <i class="fa-solid fa-circle-info"></i> <strong>Sedes Universitarias:</strong><br>
-            Haz clic sobre cualquier marcador en el mapa o busca abajo la facultad.
+        <div class="alert alert-info" role="alert" style="font-size: 0.9rem; margin-bottom: 10px; background-color: #e8f4f8; border-color: #bce8f1; color: #31708f;">
+            <i class="fa-solid fa-building"></i> <strong>Propiedades Disponibles:</strong><br>
+            Filtra por categoría o busca por nombre de propiedad.
+        </div>
+
+        <!-- Filtro por Categoría Inmobiliaria -->
+        <div style="margin-bottom: 8px;">
+            <select id="filtro-categoria" class="form-control input-sm" style="font-size: 13px;">
+                <option value="todos">Todas las categorías</option>
+                <option value="residencial">Residencial</option>
+                <option value="comercial">Comercial</option>
+                <option value="terreno">Terrenos / Lotes</option>
+            </select>
         </div>
 
         <!-- Buscador integrado en la vista inicial -->
-        <div id="panel-busqueda-facultades" style="margin-top: 10px;">
-            <input type="text" id="filtro-facultades" class="ag-input-text" placeholder="Escribí para buscar facultad..." style="width: 100%; margin-bottom: 8px;" />
-            <ul id="lista-facultades" style="list-style: none; padding: 0; max-height: 250px; overflow-y: auto; margin: 0;"></ul>
+        <div id="panel-busqueda-inmuebles" style="margin-top: 5px;">
+            <input type="text" id="filtro-inmuebles" class="ag-input-text" placeholder="Buscar propiedad..." style="width: 100%; margin-bottom: 8px; padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px;" />
+            <ul id="lista-inmuebles" style="list-style: none; padding: 0; max-height: 220px; overflow-y: auto; margin: 0;"></ul>
         </div>
     `);
 
-    // Si ya teníamos los datos descargados, los renderizamos directo
-    if (cacheFacultades) {
-        renderizarListaFacultades(cacheFacultades);
+    if (cacheInmuebles) {
+        renderizarListaInmuebles(cacheInmuebles);
     } else {
-        // Si no, los cargamos del archivo
-        fetch("dist/layers/geojson/facultades.geojson")
+        fetch("dist/layers/geojson/inmuebles.geojson")
             .then(response => {
-                if (!response.ok) throw new Error("No se pudo cargar el archivo geojson");
+                if (!response.ok) throw new Error("No se pudo cargar el archivo geojson de inmuebles");
                 return response.json();
             })
             .then(data => {
-                cacheFacultades = data.features;
-                renderizarListaFacultades(cacheFacultades);
+                cacheInmuebles = data.features;
+                renderizarListaInmuebles(cacheInmuebles);
             })
-            .catch(error => console.error("Error cargando las facultades:", error));
+            .catch(error => console.error("Error cargando los inmuebles:", error));
     }
 }
 
-// Función auxiliar para poblar la lista y manejar los filtros y el zoom
-function renderizarListaFacultades(features) {
-    const lista = document.getElementById("lista-facultades");
-    const inputFiltro = document.getElementById("filtro-facultades");
-    if (!lista || !inputFiltro) return;
+// 2. Función auxiliar con filtrado combinado (Texto + Categoría) y zoom
+function renderizarListaInmuebles(features) {
+    const lista = document.getElementById("lista-inmuebles");
+    const inputFiltro = document.getElementById("filtro-inmuebles");
+    const selectCategoria = document.getElementById("filtro-categoria");
+    if (!lista || !inputFiltro || !selectCategoria) return;
 
     function poblarUL(items) {
         lista.innerHTML = "";
@@ -904,40 +907,39 @@ function renderizarListaFacultades(features) {
 
         items.forEach(feature => {
             const p = feature.properties || {};
-            const nombreFacu = p.nombre || p.name || "Facultad sin nombre";
+            const titulo = p.titulo || "Inmueble sin título";
+            const precio = p.precio || "";
             
             const item = document.createElement("li");
-            item.textContent = nombreFacu;
+            item.innerHTML = `<strong>${titulo}</strong> <span style="color:#27ae60; font-size: 0.85rem; float:right; font-weight:bold;">${precio}</span>`;
             item.style.cssText = `
-                padding: 6px 10px;
+                padding: 8px 10px;
                 cursor: pointer;
                 border-bottom: 1px solid #eee;
                 font-size: 13px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             `;
 
             item.onmouseover = () => item.style.backgroundColor = "var(--menu-section-hover-color, #f4f4f4)";
             item.onmouseout = () => item.style.backgroundColor = "transparent";
 
-            // Acción al hacer clic en un elemento de la lista (Zoom + Sidebar)
             item.onclick = () => {
-                // Detectamos la instancia del mapa de manera segura en Argenmap
                 const mapaActual = window.map || window.mapa || (typeof map !== 'undefined' ? map : null);
                 
                 if (mapaActual) {
                     if (feature.geometry && feature.geometry.type === "Point") {
                         const coords = feature.geometry.coordinates;
-                        const lat = parseFloat(coords[1]);
-                        const lng = parseFloat(coords[0]);
-                        mapaActual.setView([lat, lng], 16); // Hace zoom a nivel 16
+                        mapaActual.setView([parseFloat(coords[1]), parseFloat(coords[0])], 16);
                     } else if (feature.geometry) {
                         const layer = L.geoJSON(feature);
                         mapaActual.fitBounds(layer.getBounds());
                     }
                 }
 
-                // Abrimos la ficha detallada de la facultad en el sidebar
-                if (typeof window.actualizarSidebarFacultad === "function") {
-                    window.actualizarSidebarFacultad(p);
+                if (typeof window.actualizarSidebarInmueble === "function") {
+                    window.actualizarSidebarInmueble(p);
                 }
             };
 
@@ -945,169 +947,137 @@ function renderizarListaFacultades(features) {
         });
     }
 
-    // Renderizado inicial completo
-    poblarUL(features);
+    function filtrarYRenderizar() {
+        const texto = inputFiltro.value.toLowerCase();
+        const categoriaSeleccionada = selectCategoria.value;
 
-    // Evento de filtrado en tiempo real
-    inputFiltro.oninput = (e) => {
-        const texto = e.target.value.toLowerCase();
         const filtradas = features.filter(f => {
             const p = f.properties || {};
-            const nombre = (p.nombre || p.name || "").toLowerCase();
-            const codigo = (p.nombre_cod || "").toLowerCase();
-            return nombre.includes(texto) || codigo.includes(texto);
+            const titulo = (p.titulo || "").toLowerCase();
+            const cat = (p.categoria || "").toLowerCase();
+
+            const coincideTexto = titulo.includes(texto);
+            const coincideCat = (categoriaSeleccionada === "todos" || cat === categoriaSeleccionada);
+
+            return coincideTexto && coincideCat;
         });
         poblarUL(filtradas);
-    };
+    }
+
+    poblarUL(features);
+
+    inputFiltro.oninput = filtrarYRenderizar;
+    selectCategoria.onchange = filtrarYRenderizar;
 }
 
-
-// 2. Función que se ejecuta al hacer clic en una Facultad en el mapa
-window.actualizarSidebarFacultad = function (p) {
-    const $contenedor = $("#facultades-contenido");
+// 3. Función que se ejecuta al hacer clic en un Inmueble en el mapa (o en la lista)
+window.actualizarSidebarInmueble = function (p) {
+    const $contenedor = $("#inmuebles-contenido");
     if ($contenedor.length === 0) return;
 
-    const id = p.id || "00";
-    const sigla = (p.nombre_cod || "default").toLowerCase().trim();
-
-    const facOption1 = `src/styles/images/facultades/${id}_${sigla}.png`;
-    const facOption2 = `src/styles/images/facultades/${sigla}.png`;
-    const facOption3 = `src/styles/images/facultades/${id}_${sigla}.jpg`;
-    const facFallback = `src/styles/images/facultades/default_univ.png`;
-
-    const ceaOption1 = `src/styles/images/estudiantes/${id}_${sigla}.png`;
-    const ceaOption2 = `src/styles/images/estudiantes/${id}_${sigla}.jpg`;
-    const ceaOption3 = `src/styles/images/estudiantes/${sigla}.png`;
-    const ceaOption4 = `src/styles/images/estudiantes/${sigla}.jpg`;
-    const ceaFallback = `src/styles/images/estudiantes/default_cea.png`;
+    let carouselIndicators = '';
+    let carouselItems = '';
+    
+    if (p.imagenes && p.imagenes.length > 0) {
+        p.imagenes.forEach((img, index) => {
+            const activeClass = index === 0 ? 'active' : '';
+            carouselIndicators += `<li data-target="#carrusel-prop" data-slide-to="${index}" class="${activeClass}"></li>`;
+            carouselItems += `
+                <div class="item ${activeClass}">
+                    <img src="src/styles/images/propiedades/${img}" style="width: 100%; height: 220px; object-fit: cover;" alt="Foto Inmueble">
+                </div>`;
+        });
+    } else {
+        carouselItems = `<div class="item active"><img src="src/styles/images/noimage.webp" style="width: 100%; height: 220px; object-fit: cover;"></div>`;
+    }
 
     let html = `
-    <div class="detalle-facultad text-center" style="padding: 10px 0;">
-        <button id="btn-volver-facultades" class="btn btn-default btn-xs mb-3 pull-left">
-            <i class="fa-solid fa-arrow-left"></i> Volver
+    <div class="detalle-inmueble" style="padding: 10px 0;">
+        <button id="btn-volver-inmuebles" class="btn btn-default btn-xs mb-3 pull-left">
+            <i class="fa-solid fa-arrow-left"></i> Volver a la lista
         </button>
         <div class="clearfix"></div>
 
-        <div class="mb-3">
-            <img src="${facOption1}" 
-                 onerror="this.onerror=null; this.src='${facOption2}'; this.onerror=function(){this.src='${facOption3}'; this.onerror=function(){this.src='${facFallback}';};};" 
-                 style="max-width: 110px; height: auto;" class="img-responsive center-block mb-2">
-            <h4 style="font-weight: bold; color: #000; margin: 10px 0 2px 0;">${p.nombre_cod || ''}</h4>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">${p.nombre || ''}</p>
+        <div id="carrusel-prop" class="carousel slide mb-3" data-ride="carousel" style="border-radius: 6px; overflow: hidden; margin-top:10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <ol class="carousel-indicators">${carouselIndicators}</ol>
+            <div class="carousel-inner" role="listbox">${carouselItems}</div>
+            <a class="left carousel-control" href="#carrusel-prop" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            </a>
+            <a class="right carousel-control" href="#carrusel-prop" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            </a>
         </div>
+
+        <h4 style="font-weight: bold; color: #2c3e50; margin: 15px 0 5px 0;">${p.titulo || 'Propiedad sin título'}</h4>
+        <h5 style="color: #27ae60; font-weight: bold; font-size: 1.3rem; margin-top: 0;">${p.precio || 'Consultar valor'}</h5>
         
-        <hr style="margin: 15px 0;">
+        <p style="color: #555; font-size: 0.95rem; text-align: justify; margin-bottom: 20px;">
+            ${p.descripcion || 'Sin descripción disponible.'}
+        </p>
         
-        <div class="info-academica text-left mb-3" style="font-size: 0.9rem;">
-            <p style="margin-bottom: 8px;">
-                <strong>Sitio Web:</strong><br>
-                <a href="${p.url_fac || '#'}" target="_blank" style="color: #337ab7; font-weight: bold;">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Acceder a la Web Oficial
-                </a>
-            </p>
+        <hr style="border-top: 1px solid #ddd; margin: 20px 0;">
 
-            <p style="margin-bottom: 8px;">
-                <strong>Comisión Estudiantil:</strong><br>
-                <span class="text-muted">${p.comision || 'Sin información registrada'}</span>
-            </p>
+        <h5 style="font-weight: bold; margin-bottom: 15px; color: #34495e;">
+            <i class="fa-solid fa-folder-open"></i> Documentación y Multimedia
+        </h5>
+        
+        <div class="row" style="margin-bottom: 20px;">
+            ${p.url_planos ? `
+            <div class="col-xs-6" style="margin-bottom: 10px; padding-right: 5px;">
+                <a href="${p.url_planos}" target="_blank" class="btn btn-default btn-block" style="border-color:#3498db; color:#3498db; font-weight:bold; padding: 12px 5px;">
+                    <i class="fa-solid fa-compass-drafting fa-lg" style="display:block; margin-bottom:8px;"></i> Planos
+                </a>
+            </div>` : ''}
+
+            ${p.url_catastro ? `
+            <div class="col-xs-6" style="margin-bottom: 10px; padding-left: 5px;">
+                <a href="${p.url_catastro}" target="_blank" class="btn btn-default btn-block" style="border-color:#e67e22; color:#e67e22; font-weight:bold; padding: 12px 5px;">
+                    <i class="fa-solid fa-map-location-dot fa-lg" style="display:block; margin-bottom:8px;"></i> Catastro
+                </a>
+            </div>` : ''}
+
+            ${p.url_360 ? `
+            <div class="col-xs-6" style="margin-bottom: 10px; padding-right: 5px;">
+                <a href="${p.url_360}" target="_blank" class="btn btn-default btn-block" style="border-color:#9b59b6; color:#9b59b6; font-weight:bold; padding: 12px 5px;">
+                    <i class="fa-solid fa-vr-cardboard fa-lg" style="display:block; margin-bottom:8px;"></i> Tour 360°
+                </a>
+            </div>` : ''}
+
+            ${p.url_drone ? `
+            <div class="col-xs-6" style="margin-bottom: 10px; padding-left: 5px;">
+                <a href="${p.url_drone}" target="_blank" class="btn btn-default btn-block" style="border-color:#2c3e50; color:#2c3e50; font-weight:bold; padding: 12px 5px;">
+                    <i class="fa-solid fa-video fa-lg" style="display:block; margin-bottom:8px;"></i> Drone
+                </a>
+            </div>` : ''}
         </div>
 
-        <div class="btn-group-vertical btn-block mt-3" style="gap: 8px;">
-            ${p.url_pdf ? `
-                <a href="${p.url_pdf}" target="_blank" class="btn btn-success btn-sm btn-block" style="font-weight: bold;">
-                    <i class="fa-solid fa-file-pdf"></i> Plan de Estudios / Documento
-                </a>
-            ` : ''}
-            ${p.url_com ? `
-                <a href="${p.url_com}" target="_blank" class="btn btn-danger btn-sm btn-block" style="font-weight: bold; background-color: #e1306c; border-color: #c13584;">
-                    <i class="fa-brands fa-instagram"></i> Instagram
-                </a>
-            ` : ''}
-        </div>
-
-<<<<<<< HEAD
         <a href="https://wa.me/5491100000000?text=Hola, quiero consultar por la propiedad: ${p.titulo}" target="_blank" class="btn btn-success btn-block" style="font-weight: bold; font-size: 1.1rem; padding: 12px; background-color: #25D366; border-color: #25D366;">
             <i class="fa-brands fa-whatsapp fa-xl" style="margin-right: 8px;"></i> Consultar Asesor
         </a>
-
-        ${p.tipo === 'facultad' ? `
-        <div class="info-academica text-left mb-3" style="font-size: 0.9rem;">
-            
-            <p style="margin-bottom: 15px;">
-                <strong style="display: block; margin-bottom: 5px;">Sitio Web:</strong>
-                ${p.url_fac ? `
-                    <a href="${p.url_fac}" target="_blank" class="btn btn-primary btn-sm" style="font-weight: bold; background-color: #337ab7; border-color: #2e6da4; color: #fff;">
-                        <i class="fa-solid fa-globe"></i> Visitar Web Oficial
-                    </a>
-                ` : `<span class="text-muted">No disponible</span>`}
-            </p>
-
-            <!-- EL BOTÓN DEL PDF AHORA ESTÁ ACÁ, SEPARADO DE LA COMISIÓN -->
-            ${p.p_e ? `
-                <p style="margin-bottom: 20px;">
-                    <a href="${p.p_e}" target="_blank" class="btn btn-danger btn-sm" style="font-weight: bold; background-color: #d9534f; border-color: #d43f3a; color: #fff;">
-                        <i class="fa-solid fa-file-pdf"></i> Ver Plan de Estudios
-                    </a>
-                </p>
-            ` : ''}
-
-            <p style="margin-bottom: 8px;">
-                <strong>Comisión Estudiantil:</strong><br>
-                <span class="text-muted">${p.comision || 'Sin información registrada'}</span>
-            </p>
-        </div>
-
-        <div class="btn-group-vertical btn-block mt-3" style="gap: 8px;">
-            <!-- ACÁ SOLO QUEDA EL INSTAGRAM -->
-            ${p.url_com ? `
-                <a href="${p.url_com}" target="_blank" class="btn btn-danger btn-sm btn-block" style="font-weight: bold; background-color: #e1306c; border-color: #c13584;">
-                    <i class="fa-brands fa-instagram"></i> Instagram
-                </a>
-            ` : ''}
-        </div>
-
-=======
->>>>>>> parent of 8615999 (V0.1)
-        <div class="mt-4 pt-3 border-top" style="margin-top: 25px;">
-            <small class="text-muted d-block mb-2">Agrupación / Centro de Estudiantes</small>
-            <img src="${ceaOption1}" 
-                 onerror="this.onerror=null; this.src='${ceaOption2}'; this.onerror=function(){this.src='${ceaOption3}'; this.onerror=function(){this.src='${ceaOption4}'; this.onerror=function(){this.src='${ceaFallback}';};};};" 
-                 style="max-width: 85px; height: auto;" class="center-block">
-        </div>
-<<<<<<< HEAD
-        ` : ''}
-
-=======
->>>>>>> parent of 8615999 (V0.1)
     </div>
     `;
     
     $contenedor.html(html);
 
-    if (!$("#facultades-panel").is(":visible")) {
-        $("#facultades-btn").click();
+    if (!$("#inmuebles-panel").is(":visible")) {
+        $("#inmuebles-btn").click();
     }
 }
 
-
-// 3. Controladores de Eventos de la Interfaz
+// 4. Controladores de Eventos de la Interfaz
 $(document).ready(function () {
-    
-    // Precargamos la vista inicial y el buscador apenas arranca la aplicación
-    setTimeout(cargarVistaInicialFacultades, 200);
+    setTimeout(cargarVistaInicialInmuebles, 200);
 
-    // Al hacer clic en el botón de la graduada en la botonera
-    $(document).on("click", "#facultades-btn", function () {
+    $(document).on("click", "#inmuebles-btn", function () {
         setTimeout(function () {
-            if ($("#facultades-panel").is(":visible") && $("#facultades-contenido").is(":empty")) {
-                cargarVistaInicialFacultades();
+            if ($("#inmuebles-panel").is(":visible") && $("#inmuebles-contenido").is(":empty")) {
+                cargarVistaInicialInmuebles();
             }
         }, 50);
     });
 
-    // Evento para el botón "Volver" dentro de la ficha de la facultad
-    $(document).on("click", "#btn-volver-facultades", function () {
-        cargarVistaInicialFacultades();
+    $(document).on("click", "#btn-volver-inmuebles", function () {
+        cargarVistaInicialInmuebles();
     });
-
 });

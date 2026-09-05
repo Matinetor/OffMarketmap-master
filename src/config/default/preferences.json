@@ -7,92 +7,92 @@
   "charts": {
     "isActive": true
   },
-  "layer_options":{
+  "layer_options": {
     "isActive": false
   },
   "metaTags": {
-    "title": "",
-    "description": "",
+    "title": "Visor Inmobiliario - Off Market",
+    "description": "Catálogo de propiedades exclusivas, planos de arquitectura, recorridos 360° y documentación catastral.",
     "image": ""
   },
   "excluded_plugins": ["minimap"],
   "mapConfig": {
     "center": {
-      "latitude": -40,
-      "longitude": -59
+      "latitude": -34.6037,
+      "longitude": -58.3816
     },
     "zoom": {
-      "initial": 4,
+      "initial": 12,
       "min": 3,
       "max": 21
     }
   },
   "showSearchBar": true,
-  "searchbar":{
+  "searchbar": {
     "isActive": true,
     "top": "5px",
     "left": "40%",
-    "color_focus": "#008dc9",
-    "background_color": "rgba(255, 255, 255, 0.7)",
+    "color_focus": "#2c3e50",
+    "background_color": "rgba(255, 255, 255, 0.9)",
     "strings": {
-      "placeholder": "Buscar lugar..."
+      "placeholder": "Buscar propiedad o zona..."
     }
   },
-  "geocoder":{
+  "geocoder": {
     "url": "https://api.ign.gob.ar/buscador/",
     "search": "search",
     "url_by_id": "places",
     "query": "q",
     "lang": "es",
-    "limit":5,
+    "limit": 5,
     "key": ""
-  }, 
+  },
   "referencias": {
     "show": false,
     "icon": "src/config/default/styles/images/referencias.png",
     "image": "src/config/styles/images/legends/referencias.png",
-    "width":"25px",
-    "height":"31px"
+    "width": "25px",
+    "height": "31px"
   },
   "theme": {
-    "headerBackground": "#157DB9",
-    "menuBackground": "#157DB9",
-    "bodyBackground": "#0094d4",
-    "activeLayer": "#33b560",
+    "headerBackground": "#2c3e50",
+    "menuBackground": "#2c3e50",
+    "bodyBackground": "#34495e",
+    "activeLayer": "#27ae60",
     "iconBar": "#4f4f4f",
     "btnColor": "#FFFFFF",
     "textLegendMenu": "#FFFFFF",
     "textLegendMenuStyle": "",
     "textMenu": "#FFFFFF",
     "textMenuStyle": ""
-    },
-"logo": {
-    "title":"CoNaPEA",
-    "src": "src/styles/images/CoNaPEA_logo.png",
+  },
+  "logo": {
+    "title": "BG OffMarket",
+    "src": "src/styles/images/BG_logo.png",
     "height": "",
     "width": "",
-    "style": "background-size: contain; max-height: 35px; border-radius: 12px;",
-    "srcLogoMini": "src/styles/images/CoNaPEA_logo.png",
+    "style": "background-size: contain; max-height: 35px; border-radius: 6px;",
+    "srcLogoMini": "src/styles/images/BG_logo.png",
     "miniHeight": "",
     "miniWidth": "",
-    "ministyle": "filter: drop-shadow(1px 1px 1px #103847); width: 5px; border-radius: 2px;margin-right: -5px;",
-    "link": "https://www.instagram.com/conapea/?hl=es"
-  },
-  "logoText": {
-    "content": "CoNaPEAmap",
-    "title":"CoNaPEAmap",
+    "ministyle": "filter: drop-shadow(1px 1px 1px #103847); width: 5px; border-radius: 2px; margin-right: -5px;",
     "link": "#"
   },
-  "title": "CoNaPEAmap",
-  "website": "https://www.instagram.com/conapea/?hl=es",
-  "favicon": "src/styles/images/CoNaPEA_logo.png",
+  "logoText": {
+    "content": "BG OffMarket",
+    "title": "Visor Inmobiliario",
+    "link": "#"
+  },
+  "title": "Visor Inmobiliario - Off Market",
+  "website": "#",
+  "favicon": "src/styles/images/BG_logo.png",
   "geoprocessing": {
     "isActive": true,
     "buttonTitle": "Geoprocesos",
     "buttonIcon": "fa fa-cog",
     "dialogTitle": "Geoprocesos",
     "strings": {
-      "bounds": "Areas a procesar"
+      "bounds": "Áreas a procesar"
     },
     "availableProcesses": [
       {
@@ -146,7 +146,7 @@
     "basemap_legend_button_text": "Ver leyenda del mapa",
     "delete_geometry": "Eliminar geometría"
   },
-    "onInit": {
+  "onInit": {
     "showToolbar": true,
     "showLayerMenu": true
   }

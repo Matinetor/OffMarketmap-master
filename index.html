@@ -6,11 +6,11 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="CoNaPEAmap es un visor de mapas interactivo que permite visualizar y consultar información sobre las facultades donde se dicta la carrera de Ingeniería en Agrimensura." />
-  <meta name="keywords" content="mapas, geografía, Argentina, visor de mapas, información geográfica" />
+  <meta name="description" content="Visor interactivo de inmuebles Off Market. Catálogo de propiedades con recorridos 360, planos y datos catastrales." />
+  <meta name="keywords" content="inmobiliaria, bienes raíces, off market, visor de mapas, propiedades, argentina" />
   <meta name="author" content="Matías Iván Bizai Germaná" />
-  <title>CoNaPEAmap - Red de Facultades de Agrimensura</title>
-  <link rel="icon" type="image/png" href="src/styles/images/CoNaPEA_logo.png">
+  <title>Visor Inmobiliario - Off Market</title>
+  <link rel="icon" type="image/png" href="src/styles/images/BG_logo.png"> <!-- Podés cambiar este logo luego -->
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://getbootstrap.com/docs/3.3/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
@@ -20,61 +20,69 @@
   <script src="src/js/plugins/jquery/jquery-3.7.0.min.js"></script>
   <script src="src/js/plugins/jquery/ui/jquery-ui.min.js"></script>
 
-  <!-- Leaflet Core (Sin restricción estricta de hash) -->
+  <!-- Leaflet Core -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.js"></script>
 
-  <!-- Funciones Globales de Integración (Facultades & GeoJSON) -->
-<!-- Script para cargar siempre fija la capa de facultades -->
-<script>
-  $(document).ready(function () {
-    const cargarFacultadesFijas = setInterval(function () {
-      if (typeof L !== "undefined" && typeof mapa !== "undefined" && mapa && mapa._leaflet_id) {
-        clearInterval(cargarFacultadesFijas);
+  <!-- Script para cargar siempre fija la capa de Inmuebles -->
+  <script>
+    $(document).ready(function () {
+      const cargarInmueblesFijos = setInterval(function () {
+        if (typeof L !== "undefined" && typeof mapa !== "undefined" && mapa && mapa._leaflet_id) {
+          clearInterval(cargarInmueblesFijos);
 
-        const iconoCustom = L.divIcon({
-          className: 'custom-div-icon',
-          html: `<div style='background-color:#2c3e50; border: 2px solid #ffffff; border-radius: 50%; width: 28px; height: 28px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.4);'>
-                  <i class='fa-solid fa-graduation-cap' style='color:#ffffff; font-size:13px;'></i>
-                 </div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14]
-        });
+          $.getJSON("dist/layers/geojson/inmuebles.geojson", function (data) {
+            const capaGeoJson = L.geoJSON(data, {
+              pointToLayer: function (feature, latlng) {
+                const cat = feature.properties.categoria;
+                
+                // Definimos colores según la categoría
+                let colorFondo = "#34495e"; // Gris por defecto
+                let icono = "fa-building";
+                
+                if (cat === "residencial") { colorFondo = "#27ae60"; icono = "fa-house"; }
+                if (cat === "comercial") { colorFondo = "#2980b9"; icono = "fa-shop"; }
+                if (cat === "terreno") { colorFondo = "#f39c12"; icono = "fa-tree"; }
 
-        $.getJSON("dist/layers/geojson/facultades.geojson", function (data) {
-          const capaGeoJson = L.geoJSON(data, {
-            pointToLayer: function (feature, latlng) {
-              return L.marker(latlng, { icon: iconoCustom });
-            },
-            onEachFeature: function (feature, layer) {
-              const p = feature.properties || {};
-              const nombre = p.nombre_cod || p.nombre || "Sede Académica";
+                const iconoCustom = L.divIcon({
+                  className: 'custom-div-icon',
+                  html: `<div style='background-color:${colorFondo}; border: 2px solid #fff; border-radius: 50%; width: 30px; height: 30px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.4);'>
+                          <i class='fa-solid ${icono}' style='color:#fff; font-size:14px;'></i>
+                        </div>`,
+                  iconSize: [30, 30],
+                  iconAnchor: [15, 15]
+                });
 
-              layer.bindTooltip(nombre, {
-                permanent: false,
-                direction: 'top',
-                offset: [0, -10]
-              });
+                return L.marker(latlng, { icon: iconoCustom });
+              },
+              onEachFeature: function (feature, layer) {
+                const p = feature.properties || {};
+                const nombre = p.titulo || "Propiedad Disponible";
 
-              layer.on('click', function (e) {
-                L.DomEvent.stopPropagation(e);
-                if (typeof window.actualizarSidebarFacultad === "function") {
-                  window.actualizarSidebarFacultad(p);
-                }
-              });
-            }
+                layer.bindTooltip(nombre, {
+                  permanent: false,
+                  direction: 'top',
+                  offset: [0, -10]
+                });
+
+                layer.on('click', function (e) {
+                  L.DomEvent.stopPropagation(e);
+                  if (typeof window.actualizarSidebarInmueble === "function") {
+                    window.actualizarSidebarInmueble(p);
+                  }
+                });
+              }
+            });
+
+            capaGeoJson.addTo(mapa);
+            console.log("✅ Capa de Inmuebles cargada y fija en el mapa.");
+          }).fail(function (jqXHR, textStatus, error) {
+            console.error("❌ Error al cargar inmuebles.geojson:", textStatus, error);
           });
-
-          // Añadir directamente al mapa principal de forma permanente
-          capaGeoJson.addTo(mapa);
-          console.log("✅ Capa de Facultades cargada y fija en el mapa.");
-        }).fail(function (jqXHR, textStatus, error) {
-          console.error("❌ Error al cargar facultades.geojson:", textStatus, error);
-        });
-      }
-    }, 200);
-  });
-</script>
+        }
+      }, 200);
+    });
+  </script>
 
   <!-- Better scale css -->
   <link rel="stylesheet" href="https://daniellsu.github.io/leaflet-betterscale/L.Control.BetterScale.css" integrity="sha384-2KDD1OkPWCaNMKkFrolRvmL1nQcNLQsqSlOueaVJK4uqJrmUBnsRRT952dh/UEFU" crossorigin="anonymous" />
@@ -107,7 +115,6 @@
   <script src="src/js/components/config-tool/configWindow.js"></script>
 
   <!-- Main Styles -->
-
   <link rel="stylesheet" href="src/styles/css/main.css" />
   <link href="src/styles/css/dashboard.css" rel="stylesheet" />
   <link href="src/js/components/fullscreen/fullscreen.css" rel="stylesheet" />
@@ -201,7 +208,6 @@
   </nav>
 
   <div class="menu-container top-around-flex">
-<<<<<<< HEAD
     <div id="botonera">
       <button class="ag-btn ag-btn-primary menu-section-btn" id="sidebar-btn" data-target="sidebar" aria-label="Abrir menú de capas" title="Menú de capas">
         <i class="fa-solid fa-layer-group" aria-label="Ícono de capas"></i>
@@ -216,12 +222,6 @@
       <!-- BOTÓN DE INMUEBLES -->
       <button class="ag-btn ag-btn-primary menu-section-btn" id="inmuebles-btn" data-target="inmuebles-panel" aria-label="Catálogo de Inmuebles" title="Inmuebles Disponibles">
         <i class="fa-solid fa-building" aria-label="Ícono de inmuebles"></i>
-      </button>
-
-      <!-- BOTÓN DE FACULTADES -->
-      <button class="ag-btn ag-btn-primary menu-section-btn" id="facultades-btn" data-target="facultades-panel" aria-label="Información de Facultades" title="Facultades">
-        <i class="fa-solid fa-graduation-cap" aria-label="Ícono de facultades"></i>
-      </button>
       </button>
 
       <button class="ag-btn ag-btn-primary menu-section-btn" id="nav-help-btn" title="Ayuda" aria-label="Abrir ayuda" data-target="help-tour">
@@ -249,71 +249,6 @@
         <div id="inmuebles-contenido">
             <div class="alert alert-info" role="alert" style="font-size: 0.9rem;">
                 <i class="fa-solid fa-circle-info"></i> Haz clic sobre un marcador en el mapa para ver los detalles de la propiedad.
-            </div>
-        </div>
-=======
-    <div class="menu-container top-around-flex">
-      <div id="botonera">
-        <button class="ag-btn ag-btn-primary menu-section-btn" id="sidebar-btn" data-target="sidebar" aria-label="Abrir menú de capas" title="Menú de capas">
-          <i class="fa-solid fa-layer-group" aria-label="Ícono de capas"></i>
-        </button>
-        <button class="ag-btn ag-btn-primary menu-section-btn" id="basemap-selector-btn" data-target="basemap-selector" aria-label="Abrir selector de mapas base" title="Selector de mapas base">
-          <i class="fa-solid fa-map" aria-label="Ícono de mapa base"></i>
-        </button>
-        <button class="ag-btn ag-btn-primary menu-section-btn" id="load-layer-btn" data-target="load-layer" aria-label="Cargar nuevas capas" title="Agregar capas">
-          <i class="bx bxs-layer-plus" aria-label="Ícono de agregar capas"></i>
-        </button>
-  
-        <!-- BOTÓN DE FACULTADES INTEGRADO -->
-        <button class="ag-btn ag-btn-primary menu-section-btn" id="facultades-btn" data-target="facultades-panel" aria-label="Información de Facultades" title="Facultades">
-          <i class="fa-solid fa-graduation-cap" aria-label="Ícono de facultades"></i>
-        </button>
-  
-        <button class="ag-btn ag-btn-primary menu-section-btn" id="nav-help-btn" title="Ayuda" aria-label="Abrir ayuda" data-target="help-tour">
-          <i class="fa-solid fa-question" aria-label="Ícono de ayuda"></i>
-        </button>
-        <button class="ag-btn ag-btn-primary menu-section-btn" id="accessibility-btn" title="Accesibilidad" aria-label="Abrir opciones de accesibilidad" data-target="accessibility">
-          <i class="fa-solid fa-universal-access" aria-label="Ícono de accesibilidad"></i>
-        </button>
->>>>>>> parent of 8615999 (V0.1)
-      </div>
-  
-      <div id="menu-content" style="display: flex">
-        <div id="sidebar" class="nav nav-sidebar panel panel-default" style="display: none"></div>
-        <div id="basemap-selector" style="display: none"></div>
-        <div id="load-layer" style="display: none"></div>
-  
-        <!-- PANEL DE FACULTADES ADAPTADO A LA ESTRUCTURA DE ARGENMAP -->
-        <div id="facultades-panel" class="nav nav-sidebar panel panel-default" style="display: none; padding: 15px; overflow-y: auto;">
-          <div id="facultades-header" style="border-bottom: 1px solid #ddd; padding-bottom: 8px; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-weight: bold; color: var(--primary-color, #2c3e50); font-size: 1.1rem;">
-              <i class="fa-solid fa-graduation-cap"></i> Unidades Académicas
-            </h4>
-            <small style="color: #777;">Ingeniería en Agrimensura</small>
-          </div>
-          <div id="facultades-contenido"></div>
-        </div>
-  
-        <div id="help-tour" style="display: none"></div>
-        <div id="accessibility" style="display: none"></div>
-      </div>
-    </div>
-
-      <!-- CONTENEDOR DE FACULTADES EN EL MENÚ IZQUIERDO -->
-      <div id="facultades-panel" class="panel panel-default" style="display: none; padding: 15px; background-color: #fff; max-height: calc(100vh - 80px); overflow-y: auto;">
-        <div id="facultades-header" class="border-bottom pb-2 mb-3">
-          <h4 style="margin: 0; font-weight: bold; color: #2c3e50;">
-            <i class="fa-solid fa-graduation-cap"></i> Unidades Académicas
-          </h4>
-          <small class="text-muted">Ingeniería en Agrimensura</small>
-        </div>
-        
-        <div id="facultades-contenido">
-            <div class="alert alert-info" role="alert" style="font-size: 0.9rem;">
-                <i class="fa-solid fa-circle-info"></i> Haz clic sobre un marcador de facultad en el mapa para ver los datos de la sede.
-            </div>
-        </div>
-      </div>
             </div>
         </div>
       </div>

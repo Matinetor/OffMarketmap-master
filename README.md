@@ -1,14 +1,22 @@
 
-<img width="256" src="src\styles\images\CoNaPEA_text.jpg" alt="CoNaPEAmap" />
+<img width="256" src="src/styles/images/argenmap-banner.png" alt="Argenmap" />
 
 ---
+[English version][README_en]
 
+Argenmap es un visor de mapas desarrollado por el [Instituto Geográfico Nacional][] de licencia libre que permite mostrar mapas base, capas superpuestas, consultar y crear datos.
 
-CoNaPEAmap es un visor de mapas web interactivo diseñado para visualizar, consultar y explorar las unidades académicas donde se dicta la carrera de Ingeniería en Agrimensura en la República Argentina.
+Está basado en [Leaflet][] y para funcionar sólo requiere ser publicado con un servidor web. A partir de un archivo de configuración en formato JSON genera un panel lateral con todas las capas publicadas.
 
-El proyecto está construido sobre Argenmap —el visor de mapas de código libre desarrollado por el [Instituto Geográfico Nacional (IGN)]— y utiliza Leaflet como motor cartográfico principal. A partir de una estructura basada en archivos de configuración JSON y capas geoespaciales, permite gestionar un panel lateral dinámico con información institucional y técnica.
+Las capas se agrupan en el panel en secciones que son definidas en el archivo de configuración.
 
+Incluye por defecto con el mapa base de la República Argentina y se pueden agregar otros.
 
+## Documentación
+- Guía rápida de [instalación][]
+- [Configurar][] capas, mapas base, estilos
+- [Funcionalidades][]
+- [Colaborar][] con el desarrollo
 
 [Instituto Geográfico Nacional]: https://www.ign.gob.ar
 [Leaflet]: https://leafletjs.com/
