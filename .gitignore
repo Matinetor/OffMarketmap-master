@@ -1,0 +1,4 @@
+# Ignorar carpetas de desarrollo
+.vscode
+.hintrc
+
